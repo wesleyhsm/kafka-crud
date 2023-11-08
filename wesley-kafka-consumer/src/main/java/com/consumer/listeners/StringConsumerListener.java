@@ -1,5 +1,6 @@
 package com.consumer.listeners;
 
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import com.consumer.listeners.custom.StringConsumerCustomListener;
@@ -22,7 +23,7 @@ public class StringConsumerListener {
 		log.info("LOG ::: message= {}", message);
 	}
 	
-	@StringConsumerCustomListener(groupId = "group-2")
+	@KafkaListener(groupId = "group-2", topics = "wesley-topic", containerFactory = "validMessageContainerFactory")
 	public void history(String message) {
 		log.info("history ::: message= {}", message);
 	}

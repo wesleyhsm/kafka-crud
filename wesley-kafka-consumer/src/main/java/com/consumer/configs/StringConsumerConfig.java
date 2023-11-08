@@ -13,10 +13,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.RecordInterceptor;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
+@RequiredArgsConstructor
 @Configuration
 public class StringConsumerConfig {
 
+	private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger(StringConsumerConfig.class);
+	
 	@Autowired
 	private KafkaProperties kafkaProperties;
 	
@@ -36,5 +44,23 @@ public class StringConsumerConfig {
 		factory.setConsumerFactory(consumerFactory);
 		
 		return factory;
+	}
+	
+	@Bean
+	ConcurrentKafkaListenerContainerFactory<String, String> validMessageContainerFactory(ConsumerFactory<String, String> consumerFactory){
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
+		factory.setConsumerFactory(consumerFactory);		
+		factory.setRecordInterceptor(validMessage());		
+		return factory;
+	}
+
+	private RecordInterceptor<String, String> validMessage() {		
+		return record -> {
+            if(record.value().contains("wesley")) {
+                log.info("Posssui a palavra wesley");
+                return record;
+            }
+            return record;
+        };
 	}
 }
